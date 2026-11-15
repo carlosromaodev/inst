@@ -19,6 +19,13 @@ Baseia-se na ideia do [Fytex/Instagram-Giveaways-Winner](https://github.com/Fyte
   - dois comentários seguidos falham.
 - Guarda cada tentativa em `registo.csv`.
 
+## Modo telemóvel
+
+O Instagram deixou de mostrar a caixa de comentário na versão desktop. Por
+isso o script abre o site **em modo telemóvel** por defeito (o mesmo que o modo
+de dispositivo das ferramentas de programador do Chrome). A janela fica
+estreita, como um ecrã de telemóvel; é normal. Faz login nessa janela.
+
 ## Instalação
 
 Precisas de Python 3.9 ou mais recente.
@@ -62,6 +69,8 @@ python comentador.py --post https://www.instagram.com/p/CODIGO/ --simular --max 
 | `--registo` | `registo.csv` | histórico em CSV |
 | `--simular` | — | não publica, só testa |
 | `--chrome` | — | caminho para um Chrome já instalado |
+| `--dispositivo` | `Pixel 7` | telemóvel simulado (ex.: `"iPhone 13"`, `"Galaxy S9+"`) |
+| `--desktop` | — | usa a versão desktop em vez da mobile |
 
 ## Avisos importantes
 

@@ -245,6 +245,10 @@ def argumentos() -> argparse.Namespace:
     p.add_argument("--registo", default="registo.csv", help="ficheiro CSV com o histórico")
     p.add_argument("--simular", action="store_true", help="escreve o comentário mas não publica (para testar)")
     p.add_argument("--chrome", help="caminho para um Chrome/Chromium já instalado (opcional)")
+    p.add_argument("--dispositivo", default="Pixel 7",
+                   help='telemóvel a simular (o Instagram só mostra a caixa de comentário na '
+                        'versão mobile). Ex.: "Pixel 7", "Galaxy S9+", "iPhone 13"')
+    p.add_argument("--desktop", action="store_true", help="abre a versão desktop em vez da mobile")
     a = p.parse_args()
 
     if a.intervalo_min < INTERVALO_MINIMO_ABSOLUTO:
@@ -263,7 +267,15 @@ def main() -> None:
     registo = Path(a.registo)
 
     with sync_playwright() as pw:
-        opcoes = dict(headless=False, viewport={"width": 1200, "height": 900})
+        if a.desktop:
+            opcoes = dict(headless=False, viewport={"width": 1200, "height": 900})
+        else:
+            # Versão mobile: o mesmo que o "modo telemóvel" das ferramentas de
+            # programador do Chrome (user agent, ecrã e toque de telemóvel).
+            if a.dispositivo not in pw.devices:
+                sys.exit(f'Dispositivo desconhecido: "{a.dispositivo}". Experimenta "Pixel 7".')
+            opcoes = {k: v for k, v in pw.devices[a.dispositivo].items() if k != "default_browser_type"}
+            opcoes["headless"] = False
         if a.chrome:
             opcoes["executable_path"] = a.chrome
         ctx = pw.chromium.launch_persistent_context(a.perfil, **opcoes)
