@@ -29,6 +29,7 @@ from pathlib import Path
 
 from playwright.sync_api import Page, TimeoutError as PWTimeout, sync_playwright
 
+VERSAO = "2026-11-15c (modo telemóvel)"
 INTERVALO_MINIMO_ABSOLUTO = 20  # segundos; não é possível configurar abaixo disto
 
 # Textos (PT/EN) que o Instagram mostra quando restringe a conta.
@@ -133,6 +134,12 @@ def encontrar_caixa(page: Page, timeout_ms: int):
         return None
 
 
+def url_comentarios(url: str) -> str | None:
+    """https://www.instagram.com/reel/CODIGO/ -> https://www.instagram.com/p/CODIGO/comments/"""
+    m = re.search(r"instagram\.com/(?:[\w.]+/)?(?:p|reel|reels|tv)/([\w-]+)", url)
+    return f"https://www.instagram.com/p/{m.group(1)}/comments/" if m else None
+
+
 def guardar_diagnostico(page: Page, pasta: Path = Path("diagnostico")) -> Path:
     """Guarda captura de ecrã e lista de campos da página para perceber falhas."""
     pasta.mkdir(exist_ok=True)
@@ -174,6 +181,12 @@ def publicar(page: Page, texto: str, simular: bool = False, timeout_ms: int = 20
     Devolve: "ok", "simulado", "bloqueado", "sem_caixa" ou "falhou".
     """
     caixa = encontrar_caixa(page, timeout_ms)
+    if caixa is None:
+        # Na versão mobile a caixa vive na página de comentários da publicação.
+        alternativo = url_comentarios(page.url)
+        if alternativo and "/comments" not in page.url:
+            page.goto(alternativo, wait_until="domcontentloaded")
+            caixa = encontrar_caixa(page, timeout_ms)
     if caixa is None:
         return "sem_caixa"
 
@@ -281,6 +294,15 @@ def main() -> None:
         ctx = pw.chromium.launch_persistent_context(a.perfil, **opcoes)
         page = ctx.pages[0] if ctx.pages else ctx.new_page()
         page.goto(a.post, wait_until="domcontentloaded")
+
+        print(f"Comentador versão {VERSAO}")
+        movel = page.evaluate("() => /Mobile|Android|iPhone/.test(navigator.userAgent)")
+        if a.desktop:
+            print("Modo: desktop")
+        elif movel:
+            print(f"Modo: telemóvel ({a.dispositivo}) ✔")
+        else:
+            print("⚠ O navegador NÃO está em modo telemóvel. A caixa de comentário pode não aparecer.")
 
         print("\n1) No navegador que abriu, faz login no Instagram tu mesmo (se ainda não estiveres).")
         print("2) Confirma que estás na publicação certa e que vês a caixa de comentário.")
