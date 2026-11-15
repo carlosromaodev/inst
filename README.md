@@ -12,7 +12,7 @@ Baseia-se na ideia do [Fytex/Instagram-Giveaways-Winner](https://github.com/Fyte
 - **Não faz login por ti** nem pede a tua palavra-passe. Fazes login à mão no
   navegador que abre; a sessão fica guardada na pasta `perfil-navegador/`.
 - Comenta só na publicação que indicares, com uma pausa aleatória entre
-  `--intervalo-min` e `--intervalo-max` segundos (mínimo de 30 s).
+  `--intervalo-min` e `--intervalo-max` segundos (mínimo de 20 s).
 - Para sozinho quando:
   - chega a `--max` comentários;
   - o Instagram mostra um aviso de bloqueio ou restrição;
@@ -55,9 +55,9 @@ python comentador.py --post https://www.instagram.com/p/CODIGO/ --simular --max 
 |---|---|---|
 | `--post` | (obrigatório) | URL da publicação |
 | `--comentarios` | `comentarios.txt` | ficheiro com os comentários |
-| `--intervalo-min` | `90` | pausa mínima em segundos (não aceita menos de 30) |
-| `--intervalo-max` | `180` | pausa máxima em segundos |
-| `--max` | `50` | máximo de comentários por sessão |
+| `--intervalo-min` | `20` | pausa mínima em segundos (não aceita menos de 20) |
+| `--intervalo-max` | `20` | pausa máxima em segundos |
+| `--max` | `5000` | máximo de comentários por sessão |
 | `--perfil` | `perfil-navegador` | pasta da sessão do navegador |
 | `--registo` | `registo.csv` | histórico em CSV |
 | `--simular` | — | não publica, só testa |
